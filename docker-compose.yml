@@ -1,0 +1,107 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:7.0.10
+    container_name: redis
+    restart: always
+    volumes:
+      - redis_volume_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - fastapi_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "com.example.service=redis"
+
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi
+    restart: always
+    ports:
+      - "8000:8000"
+    networks:
+      - fastapi_network
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - fastapi_volumes:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    labels:
+      - "com.example.service=fastapi"
+
+  celery_worker:
+    container_name: celery_worker
+    build: .
+    command: celery -A user_async.services worker --loglevel=info
+    volumes:
+      - fastapi_volumes:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
+    networks:
+      - fastapi_network
+    depends_on:
+      - fastapi
+      - redis
+
+  flower:
+    container_name: flower
+    build: .
+    command: celery -A user_async.services flower --port=5555
+    volumes:
+      - fastapi_volumes:/app
+    ports:
+      - "5556:5555"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - fastapi_network
+    depends_on:
+      - fastapi
+      - redis
+      - celery_worker
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - fastapi_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "com.example.service=postgres"
+
+volumes:
+  redis_volume_data:
+  redis_insight_volume_data:
+  postgres_data:
+  fastapi_volumes:
+
+networks:
+  fastapi_network:
