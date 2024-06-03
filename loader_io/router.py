@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-router = APIRouter(prefix='/loader_io')
+router = APIRouter()
 
 
 @router.get('/loaderio-b870ca900bf56f434c0db90bf2f6961a/')
