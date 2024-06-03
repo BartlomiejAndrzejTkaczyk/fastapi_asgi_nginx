@@ -7,10 +7,10 @@ templates = Jinja2Templates(directory="./hello_world/templates")
 
 
 @router.get('/', response_class=HTMLResponse)
-def hello_world(request: Request):
+async def hello_world(request: Request):
     return templates.TemplateResponse("hello_world.html", {"request": request})
 
 
 @router.get('/json')
-def hello_world_json():
+async def hello_world_json():
     return {"msg": "hello world"}

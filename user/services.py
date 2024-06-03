@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from sqlalchemy.exc import IntegrityError
 
 from common.database import SessionLocal
-from user.expections import UserExistsException
 from common.models import User
 
 from common.security import hashing_password
