@@ -96,6 +96,16 @@ services:
       retries: 3
     labels:
       - "com.example.service=postgres"
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    networks:
+        - fastapi_network
+    depends_on:
+      - fastapi
 
 volumes:
   redis_volume_data:
