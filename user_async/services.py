@@ -6,7 +6,7 @@ from celery import Celery
 from sqlalchemy.exc import IntegrityError
 
 from common.database import SessionLocal
-from user_async.models import User
+from common.models import User
 
 from common.security import hashing_password
 

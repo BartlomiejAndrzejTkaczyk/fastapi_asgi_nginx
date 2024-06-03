@@ -1,0 +1,4 @@
+# .dockerignore
+./venv
+./docker-compose.yml
+./.local_env

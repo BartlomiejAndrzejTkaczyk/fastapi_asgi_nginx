@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     celery_result_backend: str
 
     class Config:
-        env_file = "../.env"
+        env_file = "../.local_env"
 
 
 settings = Settings()

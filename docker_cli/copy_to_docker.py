@@ -50,7 +50,11 @@ def get_container_id(image_name):
         return None
 
 if __name__ == '__main__':
-    container_id = get_container_id('fastapi-fastapi')
-    source_dir = os.getcwd()
-    copy_files_to_docker(container_id, source_dir)
+    container_id = get_container_id('fastapi_asgi_nginx-fastapi')
+    source_dir = os.path.dirname(os.getcwd())
+    if container_id == '':
+        print('Error: Unable to get current working directory.')
+    else:
+        print('Copy from: ', source_dir)
+        copy_files_to_docker(container_id, source_dir)
 
