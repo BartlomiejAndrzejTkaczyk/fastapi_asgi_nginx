@@ -8,7 +8,7 @@ class User(Base):
     __tablename__ = 'users'
 
     id_ = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    nickname = Column(String, unique=True, index=True, nullable=False)
+    nickname = Column(String, index=True, nullable=False)
     hash_password = Column(String, nullable=False)
     info = Column(String, nullable=True)
 

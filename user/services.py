@@ -7,13 +7,6 @@ from common.models import User
 from common.security import hashing_password
 
 
-def find_user_by(nickname: str) -> User | None:
-    db = SessionLocal()
-    user = db.query(User).filter(User.nickname == nickname).first()
-
-    return user
-
-
 async def create_user(nickname: str, password: str, info: str) -> User | None:
     db = SessionLocal()
 
